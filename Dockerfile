@@ -3,7 +3,7 @@
 # To learn more about LMC, visit https://docs.openinterpreter.com/protocols/lmc-messages. #
 ###########################################################################################
 
-FROM python:3.11.8
+FROM python:3.10
 
 # Set environment variables
 # ENV OPENAI_API_KEY ...

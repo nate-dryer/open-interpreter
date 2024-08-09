@@ -1,0 +1,50 @@
+name: Spin Up Open Interpreter
+
+on:
+  push:
+    branches: ["main", "development"]
+  pull_request:
+    branches: ["main", "development"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker image
+        run: docker build --tag open-interpreter:latest .
+
+      - name: Run Docker container
+        run: docker run --name open-interpreter -d open-interpreter:latest
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+
+      - name: Create virtual environment
+        run: python -m venv venv
+
+      - name: Activate virtual environment
+        run: source venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Spin up Open Interpreter
+        run: |
+          docker exec open-interpreter bash -c "source venv/bin/activate && interpreter"
